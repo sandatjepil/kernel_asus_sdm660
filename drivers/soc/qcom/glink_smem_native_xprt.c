@@ -34,6 +34,7 @@
 #include <linux/srcu.h>
 #include <linux/wait.h>
 #include <linux/cpumask.h>
+#include <linux/pm_wakeup.h>
 #include <soc/qcom/smem.h>
 #include <soc/qcom/tracer_pkt.h>
 #include "glink_core_if.h"
@@ -226,6 +227,8 @@ struct edge_info {
 	uint32_t readback;
 	unsigned long *ramp_time_us;
 	struct mailbox_config_info *mailbox;
+	void *log_ctx;
+	struct wakeup_source wakeup;
 };
 
 /**
@@ -1228,6 +1231,7 @@ static void rx_worker(struct kthread_work *work)
 irqreturn_t irq_handler(int irq, void *priv)
 {
 	struct edge_info *einfo = (struct edge_info *)priv;
+	__pm_wakeup_event(&einfo->wakeup, 1000);
 
 	if (einfo->rx_reset_reg)
 		writel_relaxed(einfo->out_irq_mask, einfo->rx_reset_reg);
@@ -2400,6 +2404,7 @@ static int glink_smem_native_probe(struct platform_device *pdev)
 		goto invalid_key;
 	}
 	einfo->remote_proc_id = subsys_name_to_id(subsys_name);
+	wakeup_source_init(&einfo->wakeup, "glink_smem_native_xprt");
 
 	init_xprt_cfg(einfo, subsys_name);
 	init_xprt_if(einfo);
