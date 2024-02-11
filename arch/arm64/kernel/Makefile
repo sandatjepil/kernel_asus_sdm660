@@ -44,6 +44,7 @@ arm64-obj-$(CONFIG_DEBUG_FS)		+= perf_debug.o
 endif
 arm64-obj-$(CONFIG_HAVE_HW_BREAKPOINT)	+= hw_breakpoint.o
 arm64-obj-$(CONFIG_CPU_PM)		+= sleep.o suspend.o
+arm64-obj-$(CONFIG_ASMP)		+= autosmp.o
 arm64-obj-$(CONFIG_CPU_IDLE)		+= cpuidle.o
 arm64-obj-$(CONFIG_JUMP_LABEL)		+= jump_label.o
 arm64-obj-$(CONFIG_KGDB)		+= kgdb.o
